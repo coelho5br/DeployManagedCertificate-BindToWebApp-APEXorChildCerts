@@ -1,7 +1,7 @@
 # On an existing Web App, Bind a custom domain, create the DNS record to validate, Create a Managed Certificate (Free) and Bind it
 
 [![Deploy To Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcoelho5br%2Fwebapp-bind-name-and-managed-certificate%2Fmaster%2Fcustomdomain.json)
-[![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](https%3A%2F%2Fraw.githubusercontent.com%2Fcoelho5br%2Fwebapp-bind-name-and-managed-certificate%2Fmaster%2Fcustomdomain.json)
+[![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](https%3A%2F%2Fraw.githubusercontent.com%2Fcoelho5br%2FDeployManagedCertificate-BindToWebApp-APEXorChildCerts%2Fmaster%2Fazuredeploy.json)
 
 To deploy this template, you need to have the following resources:
 
