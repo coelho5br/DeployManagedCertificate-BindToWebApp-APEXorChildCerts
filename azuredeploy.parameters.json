@@ -3,19 +3,19 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "domainName": {
-            "value": "contoso.com"
+            "value": "eduaralm2.com"
         },
         "subDomainName": {
             "value": ""
         },
         "websiteName": {
-            "value": "YourWebAppName"
+            "value": "EastUS2eduaralm"
         },
         "hostingPlanName": {
-            "value": "MyASP"
+            "value": "EASTUS2"
         },
         "dnsResourceGroup": {
-            "value": "DNSResourceGroup"
+            "value": "appserviceplan"
         }
     }
 }
