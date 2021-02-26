@@ -88,11 +88,11 @@
               "type": "Microsoft.Network/dnszones/A",
               "properties": {
                 "TTL": 3600,
-                "ARecords": {
-                  "ipv4Address": [
-                    "[reference(resourceId(variables('mainTempalteRG'),'Microsoft.Web/sites', parameters('websiteName')), '2020-09-01', 'Full').properties.inboundIpAddress]"
-                  ]
-                }
+                "ARecords": [
+                  {
+                 "ipv4Address": "[reference(resourceId(variables('mainTempalteRG'),'Microsoft.Web/sites', parameters('websiteName')), '2020-09-01', 'Full').properties.inboundIpAddress]"
+                  }
+                ]
               },
               "dependsOn": [
               ]
