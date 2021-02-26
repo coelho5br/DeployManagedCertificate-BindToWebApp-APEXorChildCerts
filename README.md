@@ -13,7 +13,7 @@ To deploy this template, you need to have the following resources:
 
 This arm deployment will:
 
-1. Createa a DNS record with ASUID and CNAME when the DNS zone is on a different resource Group
-2. Add a Custom Domain to the app.
-3. Create a  Managed Certificate.
-4. Bind the Managed Certificate to the app. It can deploy a APEX/naked domain or with a subdomain.
+1. Createa a DNS record with ASUID, CNAME or A when the DNS zone is on a different resource Group
+2. Add a Custom Domain to the Web App.
+3. Create a  Managed Certificate (Free).
+4. Bind the Managed Certificate to the app. It can also deploy a APEX/naked domain.

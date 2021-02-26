@@ -9,10 +9,10 @@
             "value": ""
         },
         "websiteName": {
-            "value": "EastUS2eduaralm"
+            "value": "Eastus2Eduaralmapp"
         },
         "hostingPlanName": {
-            "value": "EASTUS2"
+            "value": "EASTUS2-ASP"
         },
         "dnsResourceGroup": {
             "value": "appserviceplan"

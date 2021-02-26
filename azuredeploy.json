@@ -4,57 +4,58 @@
   "parameters": {
     "domainName": {
       "type": "string",
-      "metadata" : {
-                "description":"Type your domain name. Ex.: contoso.com"
-       }
+      "metadata": {
+        "description": "Type your domain name. Ex.: contoso.com"
+      }
     },
     "subDomainName": {
       "type": "string",
       "defaultValue": "",
-       "metadata" : {
-                "description":"Type your subdomain name. Ex.: www. Leave it blank for APEX/Naked domain"
-       }
+      "metadata": {
+        "description": "Type your subdomain name. Ex.: www. Leave it blank for APEX/Naked domain"
+      }
     },
     "websiteName": {
       "type": "string",
-      "metadata" : {
-                "description":"Web App name that will host the Custom Domain."
+      "metadata": {
+        "description": "Web App name that will host the Custom Domain."
       }
     },
-      "hostingPlanName": {
+    "hostingPlanName": {
       "type": "string",
-       "metadata" : {
-                "description":"You App Service Plan where it is running your app."
-       }
+      "metadata": {
+        "description": "You App Service Plan where it is running your app."
+      }
     },
     "dnsResourceGroup": {
       "type": "string",
-      "metadata" :{
-                "description": "Resource Group where your dns zone is located. It will be used to create Cname and TXT record. Make sure you have access"
+      "metadata": {
+        "description": "Resource Group where your dns zone is located. It will be used to create Cname and TXT record. Make sure you have access"
       }
     }
   },
   "variables": {
     "cert": "[toLower(concat(parameters('subDomainName'), '.', parameters('domainName')))]",
     "certificateName": "[if(not(empty(parameters('subDomainName'))), variables('cert'), parameters('domainName'))]",
-    "mainTempalteRG": "[resourceGroup().name]",
-    "cnametemp": "[if(not(empty(parameters('subDomainName'))) , parameters('subDomainName') , 'test')]",
-    "asuidTemp": "[if(not(empty(parameters('subDomainName'))) , '/asuid.' , '/asuid')]"
+    "cnametemp": "[if(not(empty(parameters('subDomainName'))) , parameters('subDomainName') , 'test12345')]",
+    "asuidTemp": "[if(not(empty(parameters('subDomainName'))) , '/asuid.' , '/asuid')]",
+    "mainTempalteRG": "[resourceGroup().name]"
   },
   "resources": [
-   {
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-06-01",
       "name": "nestedTemplate-CreateDNSName",
       "resourceGroup": "[parameters('dnsResourceGroup')]",
-      "properties": 
-      {
-      "mode": "Incremental",
-      "template": {
+      "properties": {
+        "mode": "Incremental",
+        "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
-          "parameters": {},
-          "variables": {},
+          "parameters": {
+          },
+          "variables": {
+          },
           "resources": [
             {
               "apiVersion": "2018-05-01",
@@ -77,6 +78,7 @@
                 }
               },
               "dependsOn": [
+                
               ]
             },
             {
@@ -87,14 +89,14 @@
               "properties": {
                 "TTL": 3600,
                 "ARecords": {
-                    "ipv4Address": [
-                      "[reference(resourceId(variables('mainTempalteRG'),'Microsoft.Web/sites', parameters('websiteName')), '2015-08-01').inboundIpAddress]"
-                    ]
+                  "ipv4Address": [
+                    "[reference(resourceId(variables('mainTempalteRG'),'Microsoft.Web/sites', parameters('websiteName')), '2020-09-01', 'Full').properties.inboundIpAddress]"
+                  ]
                 }
               },
               "dependsOn": [
               ]
-            },            
+            },
             {
               "apiVersion": "2018-05-01",
               "name": "[concat(parameters('domainName'), variables('asuidTemp'), parameters('subDomainName'))]",
@@ -106,18 +108,19 @@
                 "TXTRecords": [
                   {
                     "value": [
-                      "[reference(resourceId(variables('mainTempalteRG'),'Microsoft.Web/sites', parameters('websiteName')), '2015-08-01').customDomainVerificationId]"
+                      "[reference(resourceId(variables('mainTempalteRG'),'Microsoft.Web/sites', parameters('websiteName')), '2020-09-01').customDomainVerificationId]"
                     ]
                   }
                 ]
               }
             }
-            ]
-          },
-      "parameters": {}
+          ]
+        },
+        "parameters": {
+        }
       }
     },
-   {
+    {
       "apiVersion": "2020-09-01",
       "name": "[concat(parameters('websiteName'), '/', variables('certificateName'))]",
       "type": "Microsoft.Web/sites/hostNameBindings",
@@ -171,8 +174,8 @@
             "value": "[reference(resourceId('Microsoft.Web/certificates', variables('certificateName'))).thumbprint]"
           }
         },
-      "dependsOn": [
-        "[concat('Microsoft.Web/certificates/',variables('certificateName'))]"
+        "dependsOn": [
+          "[concat('Microsoft.Web/certificates/',variables('certificateName'))]"
         ]
       }
     }
@@ -189,6 +192,10 @@
     "certificateThumbprint": {
       "type": "string",
       "value": "[reference(resourceId('Microsoft.Web/certificates', variables('certificateName'))).thumbprint]"
-    }
+    },
+    "inboundIpAddress-FULL": {
+      "type": "string",
+      "value":  "[reference(resourceId(variables('mainTempalteRG'),'Microsoft.Web/sites', parameters('websiteName')), '2020-09-01','Full').properties.inboundIpAddress]"
+    } 
   }
 }
