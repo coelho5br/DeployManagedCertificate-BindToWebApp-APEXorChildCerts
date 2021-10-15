@@ -157,7 +157,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://pfsenseeduaralm.blob.core.windows.net/armtemplate/certificatebinding.json",
+          "uri": "https://github.com/coelho5br/DeployManagedCertificate-BindToWebApp-APEXorChildCerts/blob/master/certificatebinding.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
