@@ -36,8 +36,8 @@
   },
   "variables": {
     "cert": "[toLower(concat(parameters('subDomainName'), '.', parameters('domainName')))]",
-    "certificateName": "[if(not(empty(parameters('subDomainName'))), variables('cert'), parameters('domainName'))]",
-    "cnametemp": "[if(not(empty(parameters('subDomainName'))) , parameters('subDomainName') , 'test12345')]",
+    "fqdndomain": "[if(not(empty(parameters('subDomainName'))), variables('cert'), parameters('domainName'))]",
+    "cnametemp": "[if(not(empty(parameters('subDomainName'))) , parameters('subDomainName') , 'nothing')]",
     "asuidTemp": "[if(not(empty(parameters('subDomainName'))) , '/asuid.' , '/asuid')]",
     "mainTempalteRG": "[resourceGroup().name]"
   },
@@ -78,7 +78,7 @@
                 }
               },
               "dependsOn": [
-                
+
               ]
             },
             {
@@ -90,7 +90,7 @@
                 "TTL": 3600,
                 "ARecords": [
                   {
-                 "ipv4Address": "[reference(resourceId(variables('mainTempalteRG'),'Microsoft.Web/sites', parameters('websiteName')), '2020-09-01', 'Full').properties.inboundIpAddress]"
+                    "ipv4Address": "[reference(resourceId(variables('mainTempalteRG'),'Microsoft.Web/sites', parameters('websiteName')), '2020-09-01', 'Full').properties.inboundIpAddress]"
                   }
                 ]
               },
@@ -122,7 +122,7 @@
     },
     {
       "apiVersion": "2020-09-01",
-      "name": "[concat(parameters('websiteName'), '/', variables('certificateName'))]",
+      "name": "[concat(parameters('websiteName'), '/', variables('fqdndomain'))]",
       "type": "Microsoft.Web/sites/hostNameBindings",
       "location": "[resourceGroup().location]",
       "properties": {
@@ -139,44 +139,47 @@
     {
       "apiVersion": "2020-09-01",
       "location": "[resourceGroup().location]",
-      "name": "[variables('certificateName')]",
+      "name": "[variables('fqdndomain')]",
       "type": "Microsoft.Web/certificates",
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]",
-        "canonicalName": "[variables('certificateName')]",
-        "domainValidationMethod": "[if(empty(parameters('subDomainName')),'http-token', 'dns-txt-token')]"
+        "canonicalName": "[variables('fqdndomain')]",
+        "domainValidationMethod": "[if(empty(parameters('subDomainName')),'http-token', 'cname-delegation')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/hostNameBindings', parameters('websiteName'),  variables('certificateName'))]"
+        "[resourceId('Microsoft.Web/sites/hostNameBindings', parameters('websiteName'),  variables('fqdndomain'))]"
       ]
     },
     {
-      "apiVersion": "2020-06-01",
-      "name": "linkedTemplate-bindManagedCertificatetoWebSite",
       "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-06-01",
+      "name": "nestedTemplate-bindManagedCertificatetoWebSite",
+      "resourceGroup": "[variables('mainTempalteRG')]",
       "properties": {
         "mode": "Incremental",
-        "templateLink": {
-          "uri": "https://github.com/coelho5br/DeployManagedCertificate-BindToWebApp-APEXorChildCerts/blob/master/certificatebinding.json",
-          "contentVersion": "1.0.0.0"
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+          },
+          "variables": {
+          },
+          "resources": [
+            {
+              "apiVersion": "2019-08-01",
+              "name": "[concat(parameters('websiteName'), '/', variables('fqdndomain'))]",
+              "type": "Microsoft.Web/sites/hostNameBindings",
+              "location": "[resourceGroup().location]",
+              "properties": {
+                "sslState": "SniEnabled",
+                "Thumbprint": "[reference(resourceId('Microsoft.Web/certificates', variables('fqdndomain'))).thumbprint]"
+              }
+            }
+
+          ]
         },
         "parameters": {
-          "webAppName": {
-            "value": "[parameters('websiteName')]"
-          },
-          "domainName": {
-            "value": "[parameters('domainName')]"
-          },
-          "location": {
-            "value": "[resourceGroup().location]"
-          },
-          "certificateThumbprint": {
-            "value": "[reference(resourceId('Microsoft.Web/certificates', variables('certificateName'))).thumbprint]"
-          }
-        },
-        "dependsOn": [
-          "[concat('Microsoft.Web/certificates/',variables('certificateName'))]"
-        ]
+        }
       }
     }
   ],
@@ -189,13 +192,13 @@
       "type": "string",
       "value": "[concat(parameters('websiteName'), '.', parameters('domainName'), '-', parameters('websiteName'))]"
     },
+    "fqdndomain": {
+      "type": "string",
+      "value": "[concat(variables('fqdndomain'))]"
+    },
     "certificateThumbprint": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.Web/certificates', variables('certificateName'))).thumbprint]"
-    },
-    "inboundIpAddress-FULL": {
-      "type": "string",
-      "value":  "[reference(resourceId(variables('mainTempalteRG'),'Microsoft.Web/sites', parameters('websiteName')), '2020-09-01','Full').properties.inboundIpAddress]"
-    } 
+      "value": "[reference(resourceId('Microsoft.Web/certificates', variables('fqdndomain'))).thumbprint]"
+    }
   }
 }
